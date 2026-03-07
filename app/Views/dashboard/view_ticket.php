@@ -181,12 +181,28 @@
                 <?php if (! empty($ticket['attachment'])): ?>
                 <div class="mt-3">
                     <h6><i class="bi bi-paperclip"></i> Attachment:</h6>
-                    <a href="../public/uploads/tickets/<?php echo $ticket['attachment'] ?>"
+                    <a href="index.php?controller=dashboard&action=getTicketAttachment&id=<?php echo $ticket['id'] ?>"
                        target="_blank"
-                       class="attachment-box">
+                       class="attachment-box"
+                       download="<?php echo htmlspecialchars($ticket['attachment']) ?>">
                         <i class="bi bi-download"></i>
                         <?php echo htmlspecialchars($ticket['attachment']) ?>
                     </a>
+
+                    <?php
+                        // Check if file is an image for preview
+                        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+                        $extension       = strtolower(pathinfo($ticket['attachment'], PATHINFO_EXTENSION));
+
+                        if (in_array($extension, $imageExtensions)):
+                    ?>
+                        <div class="mt-3">
+                            <img src="index.php?controller=dashboard&action=getTicketAttachment&id=<?php echo $ticket['id'] ?>"
+                                 alt="Attachment Preview"
+                                 class="img-fluid rounded"
+                                 style="max-width: 100%; max-height: 400px; object-fit: contain; border: 1px solid #dee2e6;">
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
             </div>

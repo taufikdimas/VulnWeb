@@ -43,6 +43,8 @@ class UserModel
     // Update user profile
     public function updateProfile($id, $data)
     {
+        $conn = $this->db->getConnection();
+
         $sql = "UPDATE users SET
                 full_name = '{$data['full_name']}',
                 email = '{$data['email']}',
@@ -50,7 +52,18 @@ class UserModel
                 phone = '{$data['phone']}'";
 
         if (isset($data['profile_picture'])) {
-            $sql .= ", profile_picture = '{$data['profile_picture']}'";
+            $profilePicture  = mysqli_real_escape_string($conn, $data['profile_picture']);
+            $sql            .= ", profile_picture = '$profilePicture'";
+
+            if (isset($data['profile_picture_data'])) {
+                $profilePictureData  = mysqli_real_escape_string($conn, $data['profile_picture_data']);
+                $sql                .= ", profile_picture_data = '$profilePictureData'";
+            }
+
+            if (isset($data['profile_picture_mime'])) {
+                $profilePictureMime  = mysqli_real_escape_string($conn, $data['profile_picture_mime']);
+                $sql                .= ", profile_picture_mime_type = '$profilePictureMime'";
+            }
         }
 
         $sql .= " WHERE id = $id";

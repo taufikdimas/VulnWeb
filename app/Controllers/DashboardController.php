@@ -74,19 +74,11 @@ class DashboardController extends BaseController
                 'phone'      => $_POST['phone'],
             ];
 
-            // Handle file upload (Vulnerable - no validation)
+            // Handle file upload to database (Vulnerable - no validation)
             if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
-                $uploadDir = '../public/uploads/';
-                if (! is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                $fileName   = $_FILES['photo']['name'];
-                $uploadPath = $uploadDir . $fileName;
-
-                // No file type validation - vulnerable
-                move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath);
-                $data['profile_picture'] = $fileName;
+                $data['profile_picture']      = $_FILES['photo']['name'];
+                $data['profile_picture_data'] = file_get_contents($_FILES['photo']['tmp_name']);
+                $data['profile_picture_mime'] = $_FILES['photo']['type'];
             }
 
             $this->userModel->updateProfile($userId, $data);
@@ -144,29 +136,26 @@ class DashboardController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $userId = $this->getCurrentUser()['id'];
 
-            // Handle file upload (Vulnerable - no validation)
-            $attachment = null;
+            // Handle file upload to database (Vulnerable - no validation)
+            $attachmentData = null;
+            $attachmentMime = null;
+            $attachmentName = null;
             if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
-                $uploadDir = '../public/uploads/tickets/';
-                if (! is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                $fileName   = time() . '_' . $_FILES['attachment']['name'];
-                $uploadPath = $uploadDir . $fileName;
-
-                // No file type validation - vulnerable
-                move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadPath);
-                $attachment = $fileName;
+                // Read file content as binary
+                $attachmentData = file_get_contents($_FILES['attachment']['tmp_name']);
+                $attachmentMime = $_FILES['attachment']['type'];
+                $attachmentName = $_FILES['attachment']['name'];
             }
 
             $data = [
-                'user_id'     => $userId,
-                'subject'     => $_POST['subject'],
-                'description' => $_POST['description'], // No XSS protection
-                'priority'    => $_POST['priority'] ?? 'medium',
-                'category'    => $_POST['category'] ?? 'other',
-                'attachment'  => $attachment,
+                'user_id'         => $userId,
+                'subject'         => $_POST['subject'],
+                'description'     => $_POST['description'], // No XSS protection
+                'priority'        => $_POST['priority'] ?? 'medium',
+                'category'        => $_POST['category'] ?? 'other',
+                'attachment'      => $attachmentName,
+                'attachment_data' => $attachmentData,
+                'attachment_mime' => $attachmentMime,
             ];
 
             $ticketId = $this->ticketModel->createTicket($data);
@@ -237,6 +226,76 @@ class DashboardController extends BaseController
             $this->view('dashboard/change_password', ['error' => $error]);
         } else {
             $this->view('dashboard/change_password');
+        }
+    }
+
+    // Serve ticket attachment from database
+    public function getTicketAttachment()
+    {
+        $ticketId = $_GET['id'] ?? 0;
+
+        $ticket = $this->ticketModel->getTicketById($ticketId);
+
+        if ($ticket && $ticket['attachment_data']) {
+            // Set appropriate headers
+            header('Content-Type: ' . ($ticket['attachment_mime_type'] ?? 'application/octet-stream'));
+            header('Content-Disposition: inline; filename="' . ($ticket['attachment'] ?? 'file') . '"');
+            header('Content-Length: ' . strlen($ticket['attachment_data']));
+
+            // Output the file data
+            echo $ticket['attachment_data'];
+            exit;
+        } else {
+            http_response_code(404);
+            echo 'File not found';
+            exit;
+        }
+    }
+
+    // Serve announcement attachment from database
+    public function getAnnouncementAttachment()
+    {
+        $announcementId = $_GET['id'] ?? 0;
+
+        $announcement = $this->announcementModel->getAnnouncementById($announcementId);
+
+        if ($announcement && $announcement['attachment_data']) {
+            // Set appropriate headers
+            header('Content-Type: ' . ($announcement['attachment_mime_type'] ?? 'application/octet-stream'));
+            header('Content-Disposition: inline; filename="' . ($announcement['attachment'] ?? 'file') . '"');
+            header('Content-Length: ' . strlen($announcement['attachment_data']));
+
+            // Output the file data
+            echo $announcement['attachment_data'];
+            exit;
+        } else {
+            http_response_code(404);
+            echo 'File not found';
+            exit;
+        }
+    }
+
+    // Serve profile picture from database
+    public function getProfilePicture()
+    {
+        $userId = $_GET['id'] ?? 0;
+
+        $user = $this->userModel->getUserById($userId);
+
+        if ($user && $user['profile_picture_data']) {
+            // Set appropriate headers
+            header('Content-Type: ' . ($user['profile_picture_mime_type'] ?? 'image/jpeg'));
+            header('Content-Disposition: inline; filename="' . ($user['profile_picture'] ?? 'profile.jpg') . '"');
+            header('Content-Length: ' . strlen($user['profile_picture_data']));
+
+            // Output the file data
+            echo $user['profile_picture_data'];
+            exit;
+        } else {
+            // Return default image or 404
+            http_response_code(404);
+            echo 'Profile picture not found';
+            exit;
         }
     }
 

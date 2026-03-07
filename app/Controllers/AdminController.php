@@ -163,25 +163,17 @@ class AdminController extends BaseController
             $content   = $_POST['content']; // Vulnerable to XSS
             $createdBy = $this->getCurrentUser()['id'];
 
-            // Handle file upload
-            $attachment = null;
+            // Handle file upload to database
+            $attachmentName = null;
+            $attachmentData = null;
+            $attachmentMime = null;
             if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
-                $uploadDir = __DIR__ . '/../../public/uploads/announcements/';
-
-                // Create directory if not exists
-                if (! is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                $fileName   = time() . '_' . $_FILES['attachment']['name'];
-                $uploadPath = $uploadDir . $fileName;
-
-                if (move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadPath)) {
-                    $attachment = 'uploads/announcements/' . $fileName;
-                }
+                $attachmentName = $_FILES['attachment']['name'];
+                $attachmentData = file_get_contents($_FILES['attachment']['tmp_name']);
+                $attachmentMime = $_FILES['attachment']['type'];
             }
 
-            $this->announcementModel->createAnnouncement($title, $content, $createdBy, $attachment);
+            $this->announcementModel->createAnnouncement($title, $content, $createdBy, $attachmentName, $attachmentData, $attachmentMime);
             $this->redirect('index.php?controller=admin&action=announcements');
         } else {
             $this->view('admin/create_announcement');
@@ -207,39 +199,16 @@ class AdminController extends BaseController
                 'content' => $_POST['content'], // Vulnerable to XSS
             ];
 
-            // Handle file upload
+            // Handle file upload to database
             if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
-                $uploadDir = __DIR__ . '/../../public/uploads/announcements/';
-
-                // Create directory if not exists
-                if (! is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                $fileName   = time() . '_' . $_FILES['attachment']['name'];
-                $uploadPath = $uploadDir . $fileName;
-
-                if (move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadPath)) {
-                    // Delete old file if exists
-                    $announcement = $this->announcementModel->getAnnouncementById($id);
-                    if ($announcement['attachment']) {
-                        $oldFile = __DIR__ . '/../../public/' . $announcement['attachment'];
-                        if (file_exists($oldFile)) {
-                            unlink($oldFile);
-                        }
-                    }
-                    $data['attachment'] = 'uploads/announcements/' . $fileName;
-                }
+                $data['attachment']      = $_FILES['attachment']['name'];
+                $data['attachment_data'] = file_get_contents($_FILES['attachment']['tmp_name']);
+                $data['attachment_mime'] = $_FILES['attachment']['type'];
             } elseif (isset($_POST['remove_attachment'])) {
                 // Remove attachment if requested
-                $announcement = $this->announcementModel->getAnnouncementById($id);
-                if ($announcement['attachment']) {
-                    $oldFile = __DIR__ . '/../../public/' . $announcement['attachment'];
-                    if (file_exists($oldFile)) {
-                        unlink($oldFile);
-                    }
-                }
-                $data['attachment'] = null;
+                $data['attachment']      = null;
+                $data['attachment_data'] = null;
+                $data['attachment_mime'] = null;
             }
 
             $this->announcementModel->updateAnnouncement($id, $data);
@@ -389,6 +358,78 @@ class AdminController extends BaseController
             $this->view('admin/change_password', ['error' => $error]);
         } else {
             $this->view('admin/change_password');
+        }
+    }
+
+    // Serve ticket attachment from database
+    public function getTicketAttachment()
+    {
+        $ticketId = $_GET['id'] ?? 0;
+
+        require_once '../app/Models/TicketModel.php';
+        $ticketModel = new TicketModel();
+        $ticket      = $ticketModel->getTicketById($ticketId);
+
+        if ($ticket && $ticket['attachment_data']) {
+            // Set appropriate headers
+            header('Content-Type: ' . ($ticket['attachment_mime_type'] ?? 'application/octet-stream'));
+            header('Content-Disposition: inline; filename="' . ($ticket['attachment'] ?? 'file') . '"');
+            header('Content-Length: ' . strlen($ticket['attachment_data']));
+
+            // Output the file data
+            echo $ticket['attachment_data'];
+            exit;
+        } else {
+            http_response_code(404);
+            echo 'File not found';
+            exit;
+        }
+    }
+
+    // Serve announcement attachment from database
+    public function getAnnouncementAttachment()
+    {
+        $announcementId = $_GET['id'] ?? 0;
+
+        $announcement = $this->announcementModel->getAnnouncementById($announcementId);
+
+        if ($announcement && $announcement['attachment_data']) {
+            // Set appropriate headers
+            header('Content-Type: ' . ($announcement['attachment_mime_type'] ?? 'application/octet-stream'));
+            header('Content-Disposition: inline; filename="' . ($announcement['attachment'] ?? 'file') . '"');
+            header('Content-Length: ' . strlen($announcement['attachment_data']));
+
+            // Output the file data
+            echo $announcement['attachment_data'];
+            exit;
+        } else {
+            http_response_code(404);
+            echo 'File not found';
+            exit;
+        }
+    }
+
+    // Serve profile picture from database
+    public function getProfilePicture()
+    {
+        $userId = $_GET['id'] ?? 0;
+
+        $user = $this->userModel->getUserById($userId);
+
+        if ($user && $user['profile_picture_data']) {
+            // Set appropriate headers
+            header('Content-Type: ' . ($user['profile_picture_mime_type'] ?? 'image/jpeg'));
+            header('Content-Disposition: inline; filename="' . ($user['profile_picture'] ?? 'profile.jpg') . '"');
+            header('Content-Length: ' . strlen($user['profile_picture_data']));
+
+            // Output the file data
+            echo $user['profile_picture_data'];
+            exit;
+        } else {
+            // Return default image or 404
+            http_response_code(404);
+            echo 'Profile picture not found';
+            exit;
         }
     }
 }

@@ -120,13 +120,13 @@
                 <?php if (! empty($announcement['attachment'])): ?>
                     <div class="mt-3 pt-3 border-top">
                         <h6 class="mb-2"><i class="bi bi-paperclip"></i> Attachment:</h6>
-                        <a href="<?php echo htmlspecialchars($announcement['attachment']) ?>"
+                        <a href="index.php?controller=dashboard&action=getAnnouncementAttachment&id=<?php echo $announcement['id'] ?>"
                            class="attachment-badge"
                            target="_blank"
-                           download>
+                           download="<?php echo htmlspecialchars($announcement['attachment']) ?>">
                             <i class="bi bi-download me-2"></i>
                             <?php
-                                $fileName = basename($announcement['attachment']);
+                                $fileName = $announcement['attachment'];
                                 $fileExt  = strtoupper(pathinfo($fileName, PATHINFO_EXTENSION));
                                 echo htmlspecialchars($fileName) . ' (' . $fileExt . ')';
                             ?>
@@ -140,7 +140,7 @@
                             if (in_array($extension, $imageExtensions)):
                         ?>
                             <div class="mt-3">
-                                <img src="<?php echo htmlspecialchars($announcement['attachment']) ?>"
+                                <img src="index.php?controller=dashboard&action=getAnnouncementAttachment&id=<?php echo $announcement['id'] ?>"
                                      alt="Attachment Preview"
                                      class="img-fluid rounded"
                                      style="max-width: 100%; max-height: 400px; object-fit: contain; border: 1px solid #dee2e6;">

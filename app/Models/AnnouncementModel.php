@@ -45,11 +45,16 @@ class AnnouncementModel
     }
 
     // Create announcement (admin) - Vulnerable to XSS
-    public function createAnnouncement($title, $content, $authorId, $attachment = null)
+    public function createAnnouncement($title, $content, $authorId, $attachmentName = null, $attachmentData = null, $attachmentMime = null)
     {
-        $attachmentValue = $attachment ? "'$attachment'" : "NULL";
-        $sql             = "INSERT INTO announcements (title, content, author_id, attachment)
-                VALUES ('$title', '$content', $authorId, $attachmentValue)";
+        $conn = $this->db->getConnection();
+
+        $attachmentNameValue = $attachmentName ? "'" . mysqli_real_escape_string($conn, $attachmentName) . "'" : "NULL";
+        $attachmentDataValue = $attachmentData ? "'" . mysqli_real_escape_string($conn, $attachmentData) . "'" : "NULL";
+        $attachmentMimeValue = $attachmentMime ? "'" . mysqli_real_escape_string($conn, $attachmentMime) . "'" : "NULL";
+
+        $sql = "INSERT INTO announcements (title, content, author_id, attachment, attachment_data, attachment_mime_type)
+                VALUES ('$title', '$content', $authorId, $attachmentNameValue, $attachmentDataValue, $attachmentMimeValue)";
         $this->db->query($sql);
         return $this->db->lastInsertId();
     }
@@ -64,6 +69,8 @@ class AnnouncementModel
     // Update announcement (admin) - Vulnerable to XSS
     public function updateAnnouncement($id, $data)
     {
+        $conn = $this->db->getConnection();
+
         $sql = "UPDATE announcements SET
                 title = '{$data['title']}',
                 content = '{$data['content']}'";
@@ -71,9 +78,20 @@ class AnnouncementModel
         // Update attachment if provided
         if (isset($data['attachment'])) {
             if ($data['attachment'] === null) {
-                $sql .= ", attachment = NULL";
+                $sql .= ", attachment = NULL, attachment_data = NULL, attachment_mime_type = NULL";
             } else {
-                $sql .= ", attachment = '{$data['attachment']}'";
+                $attachmentName  = mysqli_real_escape_string($conn, $data['attachment']);
+                $sql            .= ", attachment = '$attachmentName'";
+
+                if (isset($data['attachment_data'])) {
+                    $attachmentData  = mysqli_real_escape_string($conn, $data['attachment_data']);
+                    $sql            .= ", attachment_data = '$attachmentData'";
+                }
+
+                if (isset($data['attachment_mime'])) {
+                    $attachmentMime  = mysqli_real_escape_string($conn, $data['attachment_mime']);
+                    $sql            .= ", attachment_mime_type = '$attachmentMime'";
+                }
             }
         }
 

@@ -18,7 +18,7 @@
                             <div class="card shadow-sm">
                                 <div class="card-body text-center">
                                     <?php if (! empty($user['profile_picture'])): ?>
-                                    <img src="uploads/<?php echo htmlspecialchars($user['profile_picture']) ?>"
+                                    <img src="index.php?controller=dashboard&action=getProfilePicture&id=<?php echo $user['id'] ?>"
                                         class="profile-img mb-3"
                                         onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($user['full_name']) ?>&size=150&background=667eea&color=fff'">
                                     <?php else: ?>

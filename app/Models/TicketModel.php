@@ -17,17 +17,21 @@ class TicketModel
     // Create ticket (Vulnerable to XSS - no sanitization)
     public function createTicket($data)
     {
-        $userId      = $data['user_id'];
-        $subject     = $data['subject'];
-        $description = $data['description'];
-        $priority    = $data['priority'] ?? 'medium';
-        $category    = $data['category'] ?? 'other';
-        $attachment  = $data['attachment'] ?? null;
+        $userId         = $data['user_id'];
+        $subject        = $data['subject'];
+        $description    = $data['description'];
+        $priority       = $data['priority'] ?? 'medium';
+        $category       = $data['category'] ?? 'other';
+        $attachment     = $data['attachment'] ?? null;
+        $attachmentData = $data['attachment_data'] ?? null;
+        $attachmentMime = $data['attachment_mime'] ?? null;
 
-        $attachmentSQL = $attachment ? "'$attachment'" : 'NULL';
+        $attachmentSQL     = $attachment ? "'$attachment'" : 'NULL';
+        $attachmentDataSQL = $attachmentData ? "'" . mysqli_real_escape_string($this->db->getConnection(), $attachmentData) . "'" : 'NULL';
+        $attachmentMimeSQL = $attachmentMime ? "'$attachmentMime'" : 'NULL';
 
-        $sql = "INSERT INTO tickets (user_id, subject, description, priority, category, attachment)
-                VALUES ($userId, '$subject', '$description', '$priority', '$category', $attachmentSQL)";
+        $sql = "INSERT INTO tickets (user_id, subject, description, priority, category, attachment, attachment_data, attachment_mime_type)
+                VALUES ($userId, '$subject', '$description', '$priority', '$category', $attachmentSQL, $attachmentDataSQL, $attachmentMimeSQL)";
         $this->db->query($sql);
         return $this->db->lastInsertId();
     }
