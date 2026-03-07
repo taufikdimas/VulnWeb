@@ -1,0 +1,29 @@
+# Security Headers Disabled for Vulnerable Version
+
+# Allow all origins (CORS misconfiguration)
+
+Header set Access-Control-Allow-Origin "\*"
+
+# Disable XSS protection (makes XSS easier to exploit)
+
+Header set X-XSS-Protection "0"
+
+# Disable content type sniffing protection
+
+Header set X-Content-Type-Options "none"
+
+# Allow framing (makes clickjacking possible)
+
+Header unset X-Frame-Options
+
+# No CSP (Content Security Policy)
+
+# This allows XSS attacks to work
+
+# PHP settings for error disclosure
+
+php_flag display_errors on
+php_flag display_startup_errors on
+php_value error_reporting E_ALL
+
+# Note: This .htaccess is intentionally insecure for educational purposes
