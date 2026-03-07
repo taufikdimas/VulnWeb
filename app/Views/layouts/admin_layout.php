@@ -14,6 +14,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/modern-theme.css">
+    <style>
+        .topbar-profile-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #667eea;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -80,7 +90,14 @@
                 <div class="topbar-right">
                     <div class="dropdown">
                         <a href="#" class="user-info dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle"></i>
+                            <?php if (!empty($_SESSION['profile_picture'])): ?>
+                            <img src="index.php?controller=admin&action=getProfilePicture&id=<?php echo $_SESSION['user_id'] ?>"
+                                class="topbar-profile-img"
+                                onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['username'] ?? 'Admin') ?>&size=40&background=667eea&color=fff'">
+                            <?php else: ?>
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['username'] ?? 'Admin') ?>&size=40&background=667eea&color=fff"
+                                class="topbar-profile-img">
+                            <?php endif; ?>
                             <span><?php echo $_SESSION['username'] ?? 'Admin'; ?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">

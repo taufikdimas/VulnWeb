@@ -82,6 +82,13 @@ class DashboardController extends BaseController
             }
 
             $this->userModel->updateProfile($userId, $data);
+            
+            // Update session data
+            $_SESSION['full_name'] = $data['full_name'];
+            if (isset($data['profile_picture'])) {
+                $_SESSION['profile_picture'] = $data['profile_picture'];
+            }
+            
             $this->redirect('index.php?controller=dashboard&action=profile');
         }
     }

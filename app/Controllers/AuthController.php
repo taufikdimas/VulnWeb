@@ -49,6 +49,7 @@ class AuthController extends BaseController
                 $_SESSION['username']  = $user['username'];
                 $_SESSION['role']      = $user['role'];
                 $_SESSION['full_name'] = $user['full_name'];
+                $_SESSION['profile_picture'] = $user['profile_picture'] ?? null;
 
                 // Redirect based on role
                 if ($user['role'] == 'admin') {
