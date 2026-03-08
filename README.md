@@ -398,33 +398,6 @@
 - ❌ Weak password allowed
 - ❌ SQL Injection possible
 
-#### View User Details
 
-**Fitur:**
-
-- 👤 **Profile Information**
-  - Profile picture
-  - Full name, username
-  - Email, phone
-  - Department, job title
-- 📊 **Activity History**
-  - Tickets created (count)
-  - Last login
-  - Account created date
-  - Last password change
-- 🎫 **User's Tickets**
-  - List of tickets created by user
-  - Ticket statistics
-  - Quick view ticket
-- 🔐 **Account Settings**
-  - Account status
-  - Role
-  - Permissions
-- ⚡ **Admin Actions**
-  - Edit profile
-  - Reset password
-  - Suspend/Activate
-  - Delete account
-  - View audit log
 
 ---
