@@ -206,7 +206,7 @@ class DashboardController extends BaseController
         }
     }
 
-    // Add comment to ticket
+    // Add comment to ticket (Vulnerable - No authorization check)
     public function addComment()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -214,9 +214,12 @@ class DashboardController extends BaseController
             $userId   = $this->getCurrentUser()['id'];
             $comment  = $_POST['comment']; // No XSS protection
 
-            // Verify user owns this ticket
+            // Verify ticket exists
             $ticket = $this->ticketModel->getTicketById($ticketId);
-            if ($ticket && $ticket['user_id'] == $userId) {
+
+            // VULNERABLE: Allow any authenticated user to comment on any ticket
+            // No authorization check - IDOR vulnerability
+            if ($ticket) {
                 $this->ticketModel->addComment($ticketId, $userId, $comment);
             }
 
@@ -224,15 +227,17 @@ class DashboardController extends BaseController
         }
     }
 
-    // Close ticket
+    // Close ticket (Allow owner and admin)
     public function closeTicket()
     {
         $ticketId = $_GET['id'] ?? 0;
         $userId   = $this->getCurrentUser()['id'];
+        $userRole = $this->getCurrentUser()['role'];
 
-        // Verify user owns this ticket
         $ticket = $this->ticketModel->getTicketById($ticketId);
-        if ($ticket && $ticket['user_id'] == $userId) {
+
+        // Allow ticket owner or admin to close
+        if ($ticket && ($ticket['user_id'] == $userId || $userRole == 'admin')) {
             $this->ticketModel->closeTicket($ticketId, $userId);
         }
 
