@@ -30,19 +30,6 @@ class Router
             require_once '../app/Controllers/AuthController.php';
         }
 
-        // Load models that might be needed
-        $modelFiles = [
-            '../app/Models/UserModel.php',
-            '../app/Models/AnnouncementModel.php',
-            '../app/Models/TicketModel.php',
-        ];
-
-        foreach ($modelFiles as $modelFile) {
-            if (file_exists($modelFile)) {
-                require_once $modelFile;
-            }
-        }
-
         // Instantiate controller
         $this->controller = new $this->controller;
 

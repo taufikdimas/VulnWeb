@@ -44,11 +44,32 @@ define('DB_PORT', $_ENV['DB_PORT'] ?? '3306');
 // =========================================
 class Database
 {
+    private static $instance = null;
     private $connection;
 
-    public function __construct()
+    // Private constructor for Singleton pattern
+    private function __construct()
     {
         $this->connect();
+    }
+
+    // Get singleton instance
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new Database();
+        }
+        return self::$instance;
+    }
+
+    // Prevent cloning
+    private function __clone()
+    {}
+
+    // Prevent unserialization
+    public function __wakeup()
+    {
+        throw new Exception("Cannot unserialize singleton");
     }
 
     // Vulnerable connection - no error handling
@@ -101,6 +122,15 @@ class Database
     public function escape($value)
     {
         return $value; // Deliberately vulnerable
+    }
+
+    // Helper: Return NULL or escaped value for SQL
+    public function nullOrEscape($value)
+    {
+        if ($value === null) {
+            return 'NULL';
+        }
+        return "'" . mysqli_real_escape_string($this->connection, $value) . "'";
     }
 
     // Get connection (untuk migration)

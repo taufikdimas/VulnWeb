@@ -11,7 +11,7 @@ class TicketModel
     public function __construct()
     {
         require_once '../Config/db_config.php';
-        $this->db = new Database();
+        $this->db = Database::getInstance();
     }
 
     // Create ticket (Vulnerable to XSS - no sanitization)

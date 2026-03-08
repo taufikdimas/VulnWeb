@@ -11,7 +11,7 @@ class BaseController
     public function __construct()
     {
         require_once '../Config/db_config.php';
-        $this->db = new Database();
+        $this->db = Database::getInstance();
     }
 
     // Load model
@@ -75,5 +75,31 @@ class BaseController
         if (! $this->isAdmin()) {
             $this->redirect('index.php?controller=dashboard&action=index');
         }
+    }
+
+    // Serve attachment from database (shared method)
+    protected function serveAttachment($modelName, $id, $attachmentField = 'attachment_data', $mimeField = 'attachment_mime_type', $nameField = 'attachment')
+    {
+        $model      = $this->model($modelName);
+        $methodName = 'get' . str_replace('Model', '', $modelName) . 'ById';
+        $data       = $model->$methodName($id);
+
+        if ($data && isset($data[$attachmentField]) && $data[$attachmentField]) {
+            header('Content-Type: ' . ($data[$mimeField] ?? 'application/octet-stream'));
+            header('Content-Disposition: inline; filename="' . ($data[$nameField] ?? 'file') . '"');
+            header('Content-Length: ' . strlen($data[$attachmentField]));
+            echo $data[$attachmentField];
+            exit;
+        } else {
+            http_response_code(404);
+            echo 'File not found';
+            exit;
+        }
+    }
+
+    // Serve profile picture from database (specialized helper)
+    protected function serveProfilePicture($userId)
+    {
+        $this->serveAttachment('UserModel', $userId, 'profile_picture_data', 'profile_picture_mime_type', 'profile_picture');
     }
 }

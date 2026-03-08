@@ -238,42 +238,17 @@ class AdminController extends BaseController
     // View all tickets
     public function tickets()
     {
-        $tickets = $this->ticketModel->getAllTickets();
+        // Get filter parameters
+        $search   = $_GET['search'] ?? '';
+        $status   = $_GET['status'] ?? '';
+        $priority = $_GET['priority'] ?? '';
+        $category = $_GET['category'] ?? '';
+
+        // Use SQL-level filtering for better performance
+        $tickets = $this->ticketModel->getAllTicketsWithFilters($search, $status, $priority, $category);
 
         // Check if any filters are applied
-        $hasFilters = ! empty($_GET['search']) || ! empty($_GET['status']) ||
-        ! empty($_GET['priority']) || ! empty($_GET['category']);
-
-        // Apply filters
-        if (! empty($_GET['search'])) {
-            $search  = $_GET['search'];
-            $tickets = array_filter($tickets, function ($ticket) use ($search) {
-                return stripos($ticket['subject'], $search) !== false ||
-                stripos($ticket['id'], $search) !== false ||
-                stripos($ticket['full_name'], $search) !== false;
-            });
-        }
-
-        if (! empty($_GET['status'])) {
-            $status  = $_GET['status'];
-            $tickets = array_filter($tickets, function ($ticket) use ($status) {
-                return $ticket['status'] == $status;
-            });
-        }
-
-        if (! empty($_GET['priority'])) {
-            $priority = $_GET['priority'];
-            $tickets  = array_filter($tickets, function ($ticket) use ($priority) {
-                return $ticket['priority'] == $priority;
-            });
-        }
-
-        if (! empty($_GET['category'])) {
-            $category = $_GET['category'];
-            $tickets  = array_filter($tickets, function ($ticket) use ($category) {
-                return $ticket['category'] == $category;
-            });
-        }
+        $hasFilters = ! empty($search) || ! empty($status) || ! empty($priority) || ! empty($category);
 
         // Calculate stats based on whether filters are applied
         if ($hasFilters) {
@@ -430,71 +405,20 @@ class AdminController extends BaseController
     public function getTicketAttachment()
     {
         $ticketId = $_GET['id'] ?? 0;
-
-        require_once '../app/Models/TicketModel.php';
-        $ticketModel = new TicketModel();
-        $ticket      = $ticketModel->getTicketById($ticketId);
-
-        if ($ticket && $ticket['attachment_data']) {
-            // Set appropriate headers
-            header('Content-Type: ' . ($ticket['attachment_mime_type'] ?? 'application/octet-stream'));
-            header('Content-Disposition: inline; filename="' . ($ticket['attachment'] ?? 'file') . '"');
-            header('Content-Length: ' . strlen($ticket['attachment_data']));
-
-            // Output the file data
-            echo $ticket['attachment_data'];
-            exit;
-        } else {
-            http_response_code(404);
-            echo 'File not found';
-            exit;
-        }
+        $this->serveAttachment('TicketModel', $ticketId);
     }
 
     // Serve announcement attachment from database
     public function getAnnouncementAttachment()
     {
         $announcementId = $_GET['id'] ?? 0;
-
-        $announcement = $this->announcementModel->getAnnouncementById($announcementId);
-
-        if ($announcement && $announcement['attachment_data']) {
-            // Set appropriate headers
-            header('Content-Type: ' . ($announcement['attachment_mime_type'] ?? 'application/octet-stream'));
-            header('Content-Disposition: inline; filename="' . ($announcement['attachment'] ?? 'file') . '"');
-            header('Content-Length: ' . strlen($announcement['attachment_data']));
-
-            // Output the file data
-            echo $announcement['attachment_data'];
-            exit;
-        } else {
-            http_response_code(404);
-            echo 'File not found';
-            exit;
-        }
+        $this->serveAttachment('AnnouncementModel', $announcementId);
     }
 
     // Serve profile picture from database
     public function getProfilePicture()
     {
         $userId = $_GET['id'] ?? 0;
-
-        $user = $this->userModel->getUserById($userId);
-
-        if ($user && $user['profile_picture_data']) {
-            // Set appropriate headers
-            header('Content-Type: ' . ($user['profile_picture_mime_type'] ?? 'image/jpeg'));
-            header('Content-Disposition: inline; filename="' . ($user['profile_picture'] ?? 'profile.jpg') . '"');
-            header('Content-Length: ' . strlen($user['profile_picture_data']));
-
-            // Output the file data
-            echo $user['profile_picture_data'];
-            exit;
-        } else {
-            // Return default image or 404
-            http_response_code(404);
-            echo 'Profile picture not found';
-            exit;
-        }
+        $this->serveProfilePicture($userId);
     }
 }
