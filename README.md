@@ -4,7 +4,7 @@
 
 **IntraCorp Portal** adalah aplikasi web berbasis PHP untuk manajemen internal perusahaan yang mencakup manajemen user, sistem pengumuman (announcements), dan IT support ticketing system. Sistem ini dibangun dengan arsitektur MVC custom tanpa framework, menggunakan PHP native untuk kemudahan pembelajaran.
 
-⚠️ **CATATAN PENTING:** Aplikasi ini sengaja dibuat dengan berbagai kerentanan keamanan untuk keperluan **security training & penetration testing**. **JANGAN deploy ke production environment!**
+
 
 ---
 
