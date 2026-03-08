@@ -5,9 +5,6 @@
 **IntraCorp Portal** adalah aplikasi web berbasis PHP untuk manajemen internal perusahaan yang mencakup manajemen user, sistem pengumuman (announcements), dan IT support ticketing system. Sistem ini dibangun dengan arsitektur MVC custom tanpa framework, menggunakan PHP native untuk kemudahan pembelajaran.
 
 
-
----
-
 ---
 
 ## 👥 User Roles & Akses
@@ -97,12 +94,7 @@
 - 🔗 Forgot password link
 - 👤 Role-based redirect (Admin → Admin Panel, Employee → Dashboard)
 
-**Kerentanan (Intentional):**
 
-- ❌ SQL Injection pada login form
-- ❌ No rate limiting (brute force possible)
-- ❌ Plain text password storage
-- ❌ User enumeration via error messages
 
 #### Registration Page
 
@@ -116,12 +108,6 @@
 - 🔒 Password creation
 - ✅ Auto-registration sebagai Employee role
 
-**Kerentanan (Intentional):**
-
-- ❌ No email verification
-- ❌ SQL Injection pada registration
-- ❌ No password strength validation
-- ❌ No CAPTCHA (bot registration possible)
 
 ---
 
@@ -179,12 +165,6 @@
 - 📅 Timestamp otomatis
 - ✅ Publish immediately
 
-**Kerentanan (Intentional):**
-
-- ❌ Stored XSS di content
-- ❌ No file upload validation
-- ❌ No CSRF protection
-- ❌ File stored in database (BLOB)
 
 ---
 
@@ -234,11 +214,6 @@
 - 📎 **File Attachment** - Upload screenshot/document
 - ✅ Submit ticket
 
-**Kerentanan (Intentional):**
-
-- ❌ XSS di description field
-- ❌ File upload vulnerability
-- ❌ No CSRF protection
 
 #### Employee - Ticket Detail
 
@@ -362,13 +337,6 @@
   - Employees count
 - ➕ **Create New User**
 
-**Kerentanan (Intentional):**
-
-- ❌ IDOR - View any user via ID manipulation
-- ❌ CSRF pada delete user
-- ❌ No confirmation untuk destructive actions
-- ❌ User enumeration possible
-
 #### Create User
 
 ![Create User](public/documentation/admin-createuser.png)
@@ -391,12 +359,6 @@
   - Auto-generate password option
   - Email credentials (optional)
 
-**Validasi:**
-
-- ❌ No email format validation (intentional)
-- ❌ No username uniqueness check
-- ❌ Weak password allowed
-- ❌ SQL Injection possible
 
 
 
