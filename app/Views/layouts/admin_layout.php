@@ -15,14 +15,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/modern-theme.css">
     <style>
-        .topbar-profile-img {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #667eea;
-            margin-right: 10px;
-        }
+    .topbar-profile-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #667eea;
+        margin-right: 10px;
+    }
     </style>
 </head>
 
@@ -89,8 +89,9 @@
                 </div>
                 <div class="topbar-right">
                     <div class="dropdown">
-                        <a href="#" class="user-info dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <?php if (!empty($_SESSION['profile_picture'])): ?>
+                        <a href="#" class="user-info dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <?php if (! empty($_SESSION['profile_picture'])): ?>
                             <img src="index.php?controller=admin&action=getProfilePicture&id=<?php echo $_SESSION['user_id'] ?>"
                                 class="topbar-profile-img"
                                 onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['username'] ?? 'Admin') ?>&size=40&background=667eea&color=fff'">
@@ -101,8 +102,10 @@
                             <span><?php echo $_SESSION['username'] ?? 'Admin'; ?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="index.php?controller=admin&action=profile"><i class="bi bi-person"></i> Profile</a></li>
-                            <li><a class="dropdown-item" href="index.php?controller=admin&action=changePassword"><i class="bi bi-key"></i> Change Password</a></li>
+                            <li><a class="dropdown-item" href="index.php?controller=admin&action=profile"><i
+                                        class="bi bi-person"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="index.php?controller=admin&action=changePassword"><i
+                                        class="bi bi-key"></i> Change Password</a></li>
                         </ul>
                     </div>
                 </div>

@@ -31,290 +31,452 @@
 ?>
 
 <style>
-.search-input {
-    padding-left: 45px;
-    border-radius: 10px;
-    height: 46px;
+/* Statistics Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-.search-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    font-size: 1.1rem;
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.filter-select {
-    border-radius: 10px;
-    height: 46px;
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
-.clear-filter-btn {
-    height: 46px;
-    width: 46px;
-    border-radius: 10px;
+.stat-card.total {
+    border-left: 4px solid #2563eb;
+}
+
+.stat-card.open {
+    border-left: 4px solid #dc2626;
+}
+
+.stat-card.in-progress {
+    border-left: 4px solid #f59e0b;
+}
+
+.stat-card.closed {
+    border-left: 4px solid #16a34a;
+}
+
+.stat-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.stat-card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    font-size: 1.25rem;
 }
 
-.clear-filter-btn:hover {
-    background-color: #dc3545;
-    border-color: #dc3545;
-    color: white;
-    transform: rotate(90deg);
+.stat-card.total .stat-card-icon {
+    background: #dbeafe;
+    color: #2563eb;
 }
 
-.ticket-card {
-    border-left: 4px solid;
-    transition: all 0.3s;
-    cursor: pointer;
+.stat-card.open .stat-card-icon {
+    background: #fee2e2;
+    color: #dc2626;
 }
 
-.ticket-card:hover {
+.stat-card.in-progress .stat-card-icon {
+    background: #fef3c7;
+    color: #f59e0b;
+}
+
+.stat-card.closed .stat-card-icon {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.stat-card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* Search & Filters */
+.search-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input-wrapper i {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1rem;
+    z-index: 10;
+}
+
+.search-input-wrapper .form-control {
+    padding-left: 48px;
+    height: 48px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.search-input-wrapper .form-control:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.filter-select {
+    height: 48px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.filter-select:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.btn-action {
+    height: 48px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-action:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
-.ticket-card.priority-critical {
-    border-left-color: #dc3545;
+.btn-action.btn-primary {
+    background-color: #0d6efd;
 }
 
-.ticket-card.priority-high {
-    border-left-color: #ffc107;
+.btn-action.btn-primary:hover {
+    background-color: #0b5ed7;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
 }
 
-.ticket-card.priority-medium {
+.btn-action.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-action.btn-danger:hover {
+    background-color: #bb2d3b;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* Table */
+.table-card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.table-modern {
+    margin: 0;
+}
+
+.table-modern thead th {
+    background: #f8f9fa;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table-modern tbody td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-modern tbody tr {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+}
+
+.table-modern tbody tr.priority-critical {
+    border-left-color: #dc2626;
+}
+
+.table-modern tbody tr.priority-high {
+    border-left-color: #f59e0b;
+}
+
+.table-modern tbody tr.priority-medium {
     border-left-color: #0dcaf0;
 }
 
-.ticket-card.priority-low {
-    border-left-color: #198754;
+.table-modern tbody tr.priority-low {
+    border-left-color: #16a34a;
 }
 
-.ticket-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+.table-modern tbody tr:hover {
+    background: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 
 <div class="container-fluid">
+    <!-- Ticket Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="stat-card-header">
+                <span class="stat-card-title">Total Tickets</span>
+                <div class="stat-card-icon">
+                    <i class="bi bi-ticket-detailed-fill"></i>
+                </div>
+            </div>
+            <h2 class="stat-card-value"><?php echo $stats['total'] ?? count($tickets) ?></h2>
+        </div>
+
+        <div class="stat-card open">
+            <div class="stat-card-header">
+                <span class="stat-card-title">Open</span>
+                <div class="stat-card-icon">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                </div>
+            </div>
+            <h2 class="stat-card-value"><?php echo $stats['open'] ?? count(array_filter($tickets, fn($t) => $t['status'] == 'open')) ?></h2>
+        </div>
+
+        <div class="stat-card in-progress">
+            <div class="stat-card-header">
+                <span class="stat-card-title">In Progress</span>
+                <div class="stat-card-icon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+            <h2 class="stat-card-value"><?php echo $stats['in_progress'] ?? count(array_filter($tickets, fn($t) => $t['status'] == 'in_progress')) ?></h2>
+        </div>
+
+        <div class="stat-card closed">
+            <div class="stat-card-header">
+                <span class="stat-card-title">Closed</span>
+                <div class="stat-card-icon">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+            </div>
+            <h2 class="stat-card-value"><?php echo $stats['closed'] ?? count(array_filter($tickets, fn($t) => $t['status'] == 'closed')) ?></h2>
+        </div>
+    </div>
+
     <!-- Search & Filters -->
-    <div class="card shadow-sm mb-3">
-        <div class="card-body">
-            <form method="GET" action="index.php" id="filterForm">
-                <input type="hidden" name="controller" value="dashboard">
-                <input type="hidden" name="action" value="tickets">
+    <form method="GET" action="index.php">
+        <input type="hidden" name="controller" value="dashboard">
+        <input type="hidden" name="action" value="tickets">
 
-                <div class="row g-3 align-items-center">
-                    <!-- Search -->
-                    <div class="col-lg-3 col-md-4">
-                        <div class="position-relative">
-                            <i class="bi bi-search search-icon"></i>
-                            <input type="text"
-                                   class="form-control search-input"
-                                   name="search"
-                                   placeholder="Search tickets..."
-                                   value="<?php echo htmlspecialchars($filters['search'] ?? '') ?>">
-                        </div>
+        <div class="search-wrapper">
+            <div class="row g-3">
+                <!-- Search -->
+                <div class="col-lg-4 col-md-12">
+                    <div class="search-input-wrapper">
+                        <i class="bi bi-search"></i>
+                        <input type="text"
+                               class="form-control"
+                               name="search"
+                               placeholder="Search by ticket subject or ID..."
+                               value="<?php echo htmlspecialchars($_GET['search'] ?? '') ?>">
                     </div>
+                </div>
 
-                    <!-- Status Filter -->
-                    <div class="col-lg-2 col-md-2">
-                        <select class="form-select filter-select" name="status" onchange="this.form.submit()">
-                            <option value="">All Status</option>
-                            <option value="open" <?php echo($filters['status'] ?? '') == 'open' ? 'selected' : '' ?>>Open</option>
-                            <option value="in_progress" <?php echo($filters['status'] ?? '') == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                            <option value="closed" <?php echo($filters['status'] ?? '') == 'closed' ? 'selected' : '' ?>>Closed</option>
-                        </select>
-                    </div>
+                <!-- Status Filter -->
+                <div class="col-lg-2 col-md-3">
+                    <select class="form-select filter-select" name="status">
+                        <option value="">All Status</option>
+                        <option value="open" <?php echo(isset($_GET['status']) && $_GET['status'] == 'open') ? 'selected' : '' ?>>Open</option>
+                        <option value="in_progress" <?php echo(isset($_GET['status']) && $_GET['status'] == 'in_progress') ? 'selected' : '' ?>>In Progress</option>
+                        <option value="closed" <?php echo(isset($_GET['status']) && $_GET['status'] == 'closed') ? 'selected' : '' ?>>Closed</option>
+                    </select>
+                </div>
 
-                    <!-- Priority Filter -->
-                    <div class="col-lg-2 col-md-2">
-                        <select class="form-select filter-select" name="priority" onchange="this.form.submit()">
-                            <option value="">All Priorities</option>
-                            <option value="low" <?php echo($filters['priority'] ?? '') == 'low' ? 'selected' : '' ?>>Low</option>
-                            <option value="medium" <?php echo($filters['priority'] ?? '') == 'medium' ? 'selected' : '' ?>>Medium</option>
-                            <option value="high" <?php echo($filters['priority'] ?? '') == 'high' ? 'selected' : '' ?>>High</option>
-                            <option value="critical" <?php echo($filters['priority'] ?? '') == 'critical' ? 'selected' : '' ?>>Critical</option>
-                        </select>
-                    </div>
+                <!-- Priority Filter -->
+                <div class="col-lg-2 col-md-3">
+                    <select class="form-select filter-select" name="priority">
+                        <option value="">All Priority</option>
+                        <option value="critical" <?php echo(isset($_GET['priority']) && $_GET['priority'] == 'critical') ? 'selected' : '' ?>>Critical</option>
+                        <option value="high" <?php echo(isset($_GET['priority']) && $_GET['priority'] == 'high') ? 'selected' : '' ?>>High</option>
+                        <option value="medium" <?php echo(isset($_GET['priority']) && $_GET['priority'] == 'medium') ? 'selected' : '' ?>>Medium</option>
+                        <option value="low" <?php echo(isset($_GET['priority']) && $_GET['priority'] == 'low') ? 'selected' : '' ?>>Low</option>
+                    </select>
+                </div>
 
-                    <!-- Category Filter -->
-                    <div class="col-lg-2 col-md-2">
-                        <select class="form-select filter-select" name="category" onchange="this.form.submit()">
-                            <option value="">All Categories</option>
-                            <option value="hardware" <?php echo($filters['category'] ?? '') == 'hardware' ? 'selected' : '' ?>>Hardware</option>
-                            <option value="software" <?php echo($filters['category'] ?? '') == 'software' ? 'selected' : '' ?>>Software</option>
-                            <option value="network" <?php echo($filters['category'] ?? '') == 'network' ? 'selected' : '' ?>>Network</option>
-                            <option value="access" <?php echo($filters['category'] ?? '') == 'access' ? 'selected' : '' ?>>Access</option>
-                            <option value="email" <?php echo($filters['category'] ?? '') == 'email' ? 'selected' : '' ?>>Email</option>
-                            <option value="other" <?php echo($filters['category'] ?? '') == 'other' ? 'selected' : '' ?>>Other</option>
-                        </select>
-                    </div>
+                <!-- Category Filter -->
+                <div class="col-lg-2 col-md-3">
+                    <select class="form-select filter-select" name="category">
+                        <option value="">All Category</option>
+                        <option value="hardware" <?php echo(isset($_GET['category']) && $_GET['category'] == 'hardware') ? 'selected' : '' ?>>Hardware</option>
+                        <option value="software" <?php echo(isset($_GET['category']) && $_GET['category'] == 'software') ? 'selected' : '' ?>>Software</option>
+                        <option value="network" <?php echo(isset($_GET['category']) && $_GET['category'] == 'network') ? 'selected' : '' ?>>Network</option>
+                        <option value="access" <?php echo(isset($_GET['category']) && $_GET['category'] == 'access') ? 'selected' : '' ?>>Access</option>
+                        <option value="email" <?php echo(isset($_GET['category']) && $_GET['category'] == 'email') ? 'selected' : '' ?>>Email</option>
+                        <option value="other" <?php echo(isset($_GET['category']) && $_GET['category'] == 'other') ? 'selected' : '' ?>>Other</option>
+                    </select>
+                </div>
 
-                    <!-- Clear Filter -->
-                    <div class="col-lg-1 col-md-1">
+                <!-- Clear & Create Buttons -->
+                <div class="col-lg-2 col-md-3">
+                    <div class="d-flex gap-2">
                         <button type="button"
-                                class="btn btn-outline-secondary clear-filter-btn w-100"
+                                class="btn btn-danger btn-action"
+                                style="width: 48px;"
                                 onclick="window.location.href='index.php?controller=dashboard&action=tickets'"
                                 title="Clear Filters">
                             <i class="bi bi-x-circle"></i>
                         </button>
-                    </div>
-
-                    <!-- Create Ticket Button -->
-                    <div class="col-lg-2 col-md-3">
                         <a href="index.php?controller=dashboard&action=createTicket"
-                           class="btn btn-primary w-100"
-                           style="height: 46px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
-                            <i class="bi bi-plus-circle"></i> <span class="ms-1">New Ticket</span>
+                           class="btn btn-primary btn-action flex-grow-1">
+                            <i class="bi bi-plus-circle"></i> New Ticket
                         </a>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
-
-    <!-- Active Filters Display -->
-    <?php
-        $hasFilters = ! empty($filters['search']) || ! empty($filters['status']) || ! empty($filters['priority']) || ! empty($filters['category']);
-        if ($hasFilters):
-    ?>
-    <div class="mb-3">
-        <span class="text-muted me-2">Active filters:</span>
-        <?php if (! empty($filters['search'])): ?>
-            <span class="badge bg-info me-1">
-                Search: <?php echo htmlspecialchars($filters['search']) ?>
-            </span>
-        <?php endif; ?>
-        <?php if (! empty($filters['status'])): ?>
-            <span class="badge bg-info me-1">
-                Status: <?php echo ucfirst(str_replace('_', ' ', $filters['status'])) ?>
-            </span>
-        <?php endif; ?>
-        <?php if (! empty($filters['priority'])): ?>
-            <span class="badge bg-info me-1">
-                Priority: <?php echo ucfirst($filters['priority']) ?>
-            </span>
-        <?php endif; ?>
-        <?php if (! empty($filters['category'])): ?>
-            <span class="badge bg-info me-1">
-                Category: <?php echo ucfirst($filters['category']) ?>
-            </span>
-        <?php endif; ?>
-    </div>
-    <?php endif; ?>
+    </form>
 
     <?php if (empty($tickets)): ?>
         <!-- Empty State -->
-        <div class="card shadow-sm">
-            <div class="card-body text-center py-5">
-                <i class="bi bi-ticket" style="font-size: 5rem; color: #e0e0e0;"></i>
-                <h5 class="mt-3 text-muted">No Tickets Found</h5>
-                <p class="text-muted">No tickets match your current filters.</p>
+        <div class="table-card">
+            <div class="text-center py-5">
+                <i class="bi bi-ticket-detailed" style="font-size: 4rem; color: #cbd5e0;"></i>
+                <p class="text-muted mt-3">No support tickets found.</p>
                 <a href="index.php?controller=dashboard&action=createTicket" class="btn btn-primary mt-2">
-                    <i class="bi bi-plus-circle"></i> Create New Ticket
+                    <i class="bi bi-plus-circle"></i> Create Your First Ticket
                 </a>
             </div>
         </div>
     <?php else: ?>
-        <!-- Ticket Statistics -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card shadow-sm bg-primary text-white">
-                    <div class="card-body">
-                        <h6>Total Tickets</h6>
-                        <h3><?php echo count($tickets) ?></h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card shadow-sm bg-danger text-white">
-                    <div class="card-body">
-                        <h6>Open</h6>
-                        <h3><?php echo count(array_filter($tickets, fn($t) => $t['status'] == 'open')) ?></h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card shadow-sm bg-warning text-white">
-                    <div class="card-body">
-                        <h6>In Progress</h6>
-                        <h3><?php echo count(array_filter($tickets, fn($t) => $t['status'] == 'in_progress')) ?></h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card shadow-sm bg-success text-white">
-                    <div class="card-body">
-                        <h6>Closed</h6>
-                        <h3><?php echo count(array_filter($tickets, fn($t) => $t['status'] == 'closed')) ?></h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tickets List -->
-        <div class="row">
-            <?php foreach ($tickets as $ticket): ?>
-                <div class="col-md-6 mb-3">
-                    <div class="card ticket-card priority-<?php echo $ticket['priority'] ?> shadow-sm"
-                         onclick="window.location='index.php?controller=dashboard&action=viewTicket&id=<?php echo $ticket['id'] ?>'">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="mb-0">
-                                    <i class="bi bi-hash"></i><?php echo $ticket['id'] ?> -
-                                    <?php echo htmlspecialchars($ticket['subject']) ?>
-                                </h6>
-                                <span class="badge bg-<?php echo $statusColors[$ticket['status']] ?>">
-                                    <?php echo strtoupper(str_replace('_', ' ', $ticket['status'])) ?>
-                                </span>
-                            </div>
-
-                            <p class="text-muted small mb-2">
-                                <i class="bi bi-person-circle"></i>
-                                <strong><?php echo htmlspecialchars($ticket['full_name']) ?></strong>
-                                <small class="text-muted">(<?php echo htmlspecialchars($ticket['department']) ?>)</small>
-                            </p>
-
-                            <p class="text-muted small mb-2" style="max-height: 40px; overflow: hidden;">
-                                <?php
-                                    $message = $ticket['message'] ?? $ticket['description'] ?? '';
-                                    echo htmlspecialchars(substr($message, 0, 100));
-                                    echo strlen($message) > 100 ? '...' : '';
-                                ?>
-                            </p>
-
-                            <div class="ticket-meta">
-                                <span class="badge bg-<?php echo $priorityColors[$ticket['priority']] ?>">
-                                    <i class="bi bi-flag-fill"></i> <?php echo ucfirst($ticket['priority']) ?>
-                                </span>
-                                <span class="badge bg-secondary">
+        <!-- Tickets Table -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="table table-modern mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%">TICKET ID</th>
+                            <th style="width: 25%">SUBJECT</th>
+                            <th style="width: 15%">REQUESTER</th>
+                            <th style="width: 10%">STATUS</th>
+                            <th style="width: 10%">PRIORITY</th>
+                            <th style="width: 10%">CATEGORY</th>
+                            <th style="width: 12%">CREATED</th>
+                            <th style="width: 10%">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($tickets as $ticket): ?>
+                            <tr class="priority-<?php echo $ticket['priority'] ?>"
+                                onclick="window.location='index.php?controller=dashboard&action=viewTicket&id=<?php echo $ticket['id'] ?>'">
+                                <td>
+                                    <strong>#<?php echo $ticket['id'] ?></strong>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <?php if ($ticket['attachment']): ?>
+                                            <i class="bi bi-paperclip text-primary me-2"></i>
+                                        <?php endif; ?>
+                                        <div>
+                                            <div class="fw-semibold"><?php echo htmlspecialchars($ticket['subject']) ?></div>
+                                            <small class="text-muted">
+                                                <?php
+                                                    $description = $ticket['description'] ?? $ticket['message'] ?? '';
+                                                    echo htmlspecialchars(substr($description, 0, 50));
+                                                    echo strlen($description) > 50 ? '...' : '';
+                                                ?>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <div class="fw-semibold"><?php echo htmlspecialchars($ticket['full_name']) ?></div>
+                                        <small class="text-muted"><?php echo htmlspecialchars($ticket['department']) ?></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-<?php echo $statusColors[$ticket['status']] ?>">
+                                        <?php echo strtoupper(str_replace('_', ' ', $ticket['status'])) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-<?php echo $priorityColors[$ticket['priority']] ?>">
+                                        <i class="bi bi-flag-fill"></i> <?php echo ucfirst($ticket['priority']) ?>
+                                    </span>
+                                </td>
+                                <td>
                                     <i class="bi bi-<?php echo $categoryIcons[$ticket['category']] ?>"></i>
                                     <?php echo ucfirst($ticket['category']) ?>
-                                </span>
-                                <span class="text-muted small">
-                                    <i class="bi bi-calendar"></i>
-                                    <?php echo date('M d, Y H:i', strtotime($ticket['created_at'])) ?>
-                                </span>
-                            </div>
-
-                            <?php if ($ticket['attachment']): ?>
-                            <div class="mt-2">
-                                <i class="bi bi-paperclip text-primary"></i>
-                                <small class="text-primary">Has attachment</small>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+                                </td>
+                                <td>
+                                    <small>
+                                        <?php echo date('M d, Y', strtotime($ticket['created_at'])) ?><br>
+                                        <?php echo date('H:i', strtotime($ticket['created_at'])) ?>
+                                    </small>
+                                </td>
+                                <td>
+                                    <a href="index.php?controller=dashboard&action=viewTicket&id=<?php echo $ticket['id'] ?>"
+                                       class="btn btn-sm btn-primary"
+                                       onclick="event.stopPropagation()">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="text-center mt-3">

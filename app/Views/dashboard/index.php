@@ -75,22 +75,25 @@
 
 .ticket-card {
     border: 1px solid #e9ecef;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 1rem;
     margin-bottom: 0.75rem;
     transition: all 0.3s ease;
     background: white;
+    cursor: pointer;
 }
 
 .ticket-card:hover {
     border-color: #667eea;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
 }
 
 .ticket-subject {
     font-weight: 500;
     color: #2d3748;
     margin-bottom: 0.5rem;
+    font-size: 0.95rem;
 }
 
 .ticket-meta {
@@ -202,7 +205,7 @@
     <div class="announcement-card" onclick="window.location.href='index.php?controller=dashboard&action=announcements'">
         <div class="announcement-title"><?php echo htmlspecialchars($announcement['title']) ?></div>
         <div class="announcement-content">
-            <?php 
+            <?php
                 $content = htmlspecialchars($announcement['content']);
                 echo strlen($content) > 150 ? substr($content, 0, 150) . '...' : $content;
             ?>
@@ -244,10 +247,7 @@
     <?php foreach (array_slice($tickets, 0, 5) as $ticket): ?>
     <div class="ticket-card" onclick="window.location.href='index.php?controller=dashboard&action=viewTicket&id=<?php echo $ticket['id'] ?>'">
         <div class="ticket-subject">
-            <?php 
-                $subject = htmlspecialchars($ticket['subject']);
-                echo strlen($subject) > 60 ? substr($subject, 0, 60) . '...' : $subject;
-            ?>
+            <?php echo htmlspecialchars($ticket['subject']) ?>
         </div>
         <div class="ticket-meta">
             <span class="text-muted">
@@ -274,7 +274,7 @@
         </div>
     </div>
     <?php endforeach; ?>
-    
+
     <div class="text-center mt-3">
         <a href="index.php?controller=dashboard&action=tickets" class="btn btn-outline-primary">
             <i class="bi bi-list-ul"></i> View All Tickets

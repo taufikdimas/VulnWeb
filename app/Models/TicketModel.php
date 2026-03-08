@@ -39,7 +39,15 @@ class TicketModel
     // Get tickets by user
     public function getTicketsByUser($userId)
     {
-        $sql    = "SELECT * FROM tickets WHERE user_id = $userId ORDER BY created_at DESC";
+        $sql = "SELECT t.*, u.username, u.full_name, u.department,
+                       a.username as assigned_username, a.full_name as assigned_full_name
+                FROM tickets t
+                JOIN users u ON t.user_id = u.id
+                LEFT JOIN users a ON t.assigned_to = a.id
+                WHERE t.user_id = $userId
+                ORDER BY
+                    FIELD(t.priority, 'critical', 'high', 'medium', 'low'),
+                    t.created_at DESC";
         $result = $this->db->query($sql);
         return $this->db->fetchAll($result);
     }

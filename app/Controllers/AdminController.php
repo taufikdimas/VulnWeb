@@ -92,6 +92,14 @@ class AdminController extends BaseController
         $this->redirect('index.php?controller=admin&action=users');
     }
 
+    // View user detail
+    public function viewUser()
+    {
+        $id   = $_GET['id'];
+        $user = $this->userModel->getUserById($id);
+        $this->view('admin/view_user', ['user' => $user]);
+    }
+
     // Edit user
     public function editUser()
     {
@@ -153,6 +161,14 @@ class AdminController extends BaseController
             'announcements' => $announcements,
             'search'        => $search,
         ]);
+    }
+
+    // View announcement detail
+    public function viewAnnouncement()
+    {
+        $id           = $_GET['id'];
+        $announcement = $this->announcementModel->getAnnouncementById($id);
+        $this->view('admin/view_announcement', ['announcement' => $announcement]);
     }
 
     // Create announcement
@@ -223,7 +239,56 @@ class AdminController extends BaseController
     public function tickets()
     {
         $tickets = $this->ticketModel->getAllTickets();
-        $stats   = $this->ticketModel->getTicketStats();
+
+        // Check if any filters are applied
+        $hasFilters = ! empty($_GET['search']) || ! empty($_GET['status']) ||
+        ! empty($_GET['priority']) || ! empty($_GET['category']);
+
+        // Apply filters
+        if (! empty($_GET['search'])) {
+            $search  = $_GET['search'];
+            $tickets = array_filter($tickets, function ($ticket) use ($search) {
+                return stripos($ticket['subject'], $search) !== false ||
+                stripos($ticket['id'], $search) !== false ||
+                stripos($ticket['full_name'], $search) !== false;
+            });
+        }
+
+        if (! empty($_GET['status'])) {
+            $status  = $_GET['status'];
+            $tickets = array_filter($tickets, function ($ticket) use ($status) {
+                return $ticket['status'] == $status;
+            });
+        }
+
+        if (! empty($_GET['priority'])) {
+            $priority = $_GET['priority'];
+            $tickets  = array_filter($tickets, function ($ticket) use ($priority) {
+                return $ticket['priority'] == $priority;
+            });
+        }
+
+        if (! empty($_GET['category'])) {
+            $category = $_GET['category'];
+            $tickets  = array_filter($tickets, function ($ticket) use ($category) {
+                return $ticket['category'] == $category;
+            });
+        }
+
+        // Calculate stats based on whether filters are applied
+        if ($hasFilters) {
+            // Recalculate stats from filtered tickets
+            $stats = [
+                'total'       => count($tickets),
+                'open'        => count(array_filter($tickets, fn($t) => $t['status'] == 'open')),
+                'in_progress' => count(array_filter($tickets, fn($t) => $t['status'] == 'in_progress')),
+                'closed'      => count(array_filter($tickets, fn($t) => $t['status'] == 'closed')),
+            ];
+        } else {
+            // Use stats from model for better performance
+            $stats = $this->ticketModel->getTicketStats();
+        }
+
         $this->view('admin/tickets', [
             'tickets' => $tickets,
             'stats'   => $stats,

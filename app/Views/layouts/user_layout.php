@@ -78,7 +78,7 @@
                 <div class="topbar-right">
                     <div class="dropdown">
                         <a href="#" class="user-info dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <?php if (!empty($_SESSION['profile_picture'])): ?>
+                            <?php if (! empty($_SESSION['profile_picture'])): ?>
                             <img src="index.php?controller=dashboard&action=getProfilePicture&id=<?php echo $_SESSION['user_id'] ?>"
                                 class="topbar-profile-img"
                                 onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['username'] ?? 'User') ?>&size=40&background=667eea&color=fff'">

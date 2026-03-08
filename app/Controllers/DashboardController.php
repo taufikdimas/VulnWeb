@@ -54,6 +54,22 @@ class DashboardController extends BaseController
         ]);
     }
 
+    // View announcement detail
+    public function viewAnnouncement()
+    {
+        $id           = $_GET['id'] ?? 0;
+        $announcement = $this->announcementModel->getAnnouncementById($id);
+
+        if (! $announcement) {
+            $this->redirect('index.php?controller=dashboard&action=announcements');
+            return;
+        }
+
+        $this->view('dashboard/view_announcement', [
+            'announcement' => $announcement,
+        ]);
+    }
+
     // View profile
     public function profile()
     {
@@ -82,13 +98,13 @@ class DashboardController extends BaseController
             }
 
             $this->userModel->updateProfile($userId, $data);
-            
+
             // Update session data
             $_SESSION['full_name'] = $data['full_name'];
             if (isset($data['profile_picture'])) {
                 $_SESSION['profile_picture'] = $data['profile_picture'];
             }
-            
+
             $this->redirect('index.php?controller=dashboard&action=profile');
         }
     }
@@ -102,11 +118,57 @@ class DashboardController extends BaseController
         $priority = isset($_GET['priority']) ? $_GET['priority'] : '';
         $category = isset($_GET['category']) ? $_GET['category'] : '';
 
-        // Get all tickets with filters (not just user's tickets)
-        $tickets = $this->ticketModel->getAllTicketsWithFilters($search, $status, $priority, $category);
+        // Check if any filters are applied
+        $hasFilters = ! empty($search) || ! empty($status) || ! empty($priority) || ! empty($category);
+
+        // Get ALL tickets (not just user's tickets - allow employees to see all tickets)
+        $tickets = $this->ticketModel->getAllTickets();
+
+        // Apply filters if any
+        if (!empty($search)) {
+            $tickets = array_filter($tickets, function($ticket) use ($search) {
+                return stripos($ticket['subject'], $search) !== false ||
+                       stripos($ticket['description'], $search) !== false ||
+                       stripos($ticket['id'], $search) !== false ||
+                       stripos($ticket['full_name'], $search) !== false;
+            });
+        }
+
+        if (!empty($status)) {
+            $tickets = array_filter($tickets, function($ticket) use ($status) {
+                return $ticket['status'] == $status;
+            });
+        }
+
+        if (!empty($priority)) {
+            $tickets = array_filter($tickets, function($ticket) use ($priority) {
+                return $ticket['priority'] == $priority;
+            });
+        }
+
+        if (!empty($category)) {
+            $tickets = array_filter($tickets, function($ticket) use ($category) {
+                return $ticket['category'] == $category;
+            });
+        }
+
+        // Calculate stats based on whether filters are applied
+        if ($hasFilters) {
+            // Recalculate stats from filtered tickets
+            $stats = [
+                'total'       => count($tickets),
+                'open'        => count(array_filter($tickets, fn($t) => $t['status'] == 'open')),
+                'in_progress' => count(array_filter($tickets, fn($t) => $t['status'] == 'in_progress')),
+                'closed'      => count(array_filter($tickets, fn($t) => $t['status'] == 'closed')),
+            ];
+        } else {
+            // Get stats from model for better performance
+            $stats = $this->ticketModel->getTicketStats();
+        }
 
         $this->view('dashboard/tickets', [
             'tickets' => $tickets,
+            'stats'   => $stats,
             'filters' => [
                 'search'   => $search,
                 'status'   => $status,

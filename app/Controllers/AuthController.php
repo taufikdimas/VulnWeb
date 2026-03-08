@@ -45,10 +45,10 @@ class AuthController extends BaseController
                 $this->userModel->updateLastLogin($user['id']);
 
                 // Set session
-                $_SESSION['user_id']   = $user['id'];
-                $_SESSION['username']  = $user['username'];
-                $_SESSION['role']      = $user['role'];
-                $_SESSION['full_name'] = $user['full_name'];
+                $_SESSION['user_id']         = $user['id'];
+                $_SESSION['username']        = $user['username'];
+                $_SESSION['role']            = $user['role'];
+                $_SESSION['full_name']       = $user['full_name'];
                 $_SESSION['profile_picture'] = $user['profile_picture'] ?? null;
 
                 // Redirect based on role
